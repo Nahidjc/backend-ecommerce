@@ -100,7 +100,14 @@ USE_L10N = True
 
 USE_TZ = True
 
+
 CORS_ALLOW_ALL_ORIGINS = True
 
 
 STATIC_URL = '/static/'
+MEDIA_URL = '/images/'
+
+STATICFILES_DIRS = [
+    BASE_DIR/'static'
+]
+MEDIA_ROOT = 'static/images'
