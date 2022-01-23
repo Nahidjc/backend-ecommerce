@@ -21,9 +21,9 @@ def getRoutes(request):
 def getProducts(request):
     if request.method == 'GET':
         products = Product.objects.all()
-        print(len(products))
+        # print(len(products))
         serializer = ProductSerializer(products, many=True)
-        print(serializer.data)
+        # print(serializer.data)
     return Response(serializer.data)
 
 
@@ -34,8 +34,8 @@ def getProducts(request):
 
 @api_view(['GET', 'POST'])
 def getProduct(request, pk):
-    for product in products:
-        if product['_id'] == pk:
-            pd = product
+    product = Product.objects.get(_id=pk)
+    print("Nahid", product)
+    serializer = ProductSerializer(product)
 
-    return Response(pd)
+    return Response(serializer.data)
