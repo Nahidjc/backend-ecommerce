@@ -19,6 +19,7 @@ from rest_framework import generics
 def addOrderItems(request):
     user = request.user
     data = request.data
+    print(data)
     orderItems = data['orderItems']
     if orderItems and len(orderItems) == 0:
         return Response({'detail': 'No Order Items'}, status=status.HTTP_400_BAD_REQUEST)
@@ -39,6 +40,8 @@ def addOrderItems(request):
             country=data['shippingAddress']['country'],
         )
 
+        print('only shipping', shipping)
+
         for i in orderItems:
             product = Product.objects.get(_id=i['product'])
             item = OrderItem.objects.create(
@@ -52,4 +55,21 @@ def addOrderItems(request):
             product.countInStock -= item.qty
             product.save()
         serializer = OrderSerializer(order, many=False)
+        print(serializer.data)
         return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getOrderItems(request, pk):
+    user = request.user
+    try:
+        order = Order.objects.get(_id=pk)
+        if user.is_staff or order.user == user:
+            serializer = OrderSerializer(order, many=False)
+            return Response(serializer.data)
+        else:
+            Response({'detail': 'Not authorized to view this order'},
+                     status=status.HTTP_400_BAD_REQUEST)
+    except:
+        return Response({'detail': 'Order does not exist'},)

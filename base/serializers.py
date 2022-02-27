@@ -83,8 +83,9 @@ class OrderSerializer(serializers.ModelSerializer):
     def get_shippingAddress(self, obj):
         try:
             address = ShippingAddressSerializer(
-                obj.shipppingAddress, many=False
-            )
+                obj.shippingaddress, many=False).data
+            print(address)
         except:
+            print("kaj hoy na")
             address = False
         return address
