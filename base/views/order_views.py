@@ -13,13 +13,18 @@ from rest_framework import status
 
 from rest_framework import generics
 
+# send email
+from django.core.mail import EmailMessage
+from django.contrib.sites.shortcuts import get_current_site
+from django.template.loader import render_to_string
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def addOrderItems(request):
     user = request.user
     data = request.data
-    print(data)
+    print(user.email)
     orderItems = data['orderItems']
     if orderItems and len(orderItems) == 0:
         return Response({'detail': 'No Order Items'}, status=status.HTTP_400_BAD_REQUEST)
@@ -36,7 +41,7 @@ def addOrderItems(request):
             order=order,
             address=data['shippingAddress']['address'],
             city=data['shippingAddress']['city'],
-            postalCode=data['shippingAddress']['postalCode'],
+            postalCode=data['shippingAddress']['postalcode'],
             country=data['shippingAddress']['country'],
         )
 
@@ -55,6 +60,10 @@ def addOrderItems(request):
             product.countInStock -= item.qty
             product.save()
         serializer = OrderSerializer(order, many=False)
+        email_body = 'Hi '+user.username+' Your order is successfully done'
+        data = {'email_body': email_body, 'to_email': user.email,
+                'email_subject': 'Confirm Your Order'}
+        send_email(data)
         print(serializer.data)
         return Response(serializer.data)
 
@@ -73,3 +82,16 @@ def getOrderItems(request, pk):
                      status=status.HTTP_400_BAD_REQUEST)
     except:
         return Response({'detail': 'Order does not exist'},)
+
+
+def send_email(data):
+    # current_site = get_current_site(request)
+    # mail_subject = 'An Account Created'
+    # message = render_to_string('loanApp/email.html', {
+    #     'user': user
+    # })
+    # send_mail = form.cleaned_data['username']
+    email = EmailMessage(
+        subject=data['email_subject'], body=data['email_body'], to=[data['to_email']])
+    print('email', email)
+    email.send()

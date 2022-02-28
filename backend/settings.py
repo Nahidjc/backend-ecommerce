@@ -2,6 +2,13 @@
 
 from datetime import timedelta
 from pathlib import Path
+# import environ
+import os
+from decouple import config
+# env = environ.Env(
+#     # set casting, default value
+#     DEBUG=(bool, False)
+# )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -158,5 +165,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'nahidjc.cse@gmail.com'
-EMAIL_HOST_PASSWORD = 'Nahid2194'
+# EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = 'Nahid2194@#'
+# EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+print('From settings', EMAIL_HOST_USER, EMAIL_HOST_PASSWORD)
 EMAIL_PORT = 587
+DEFAULT_FROM_EMAIL = 'NihaShopBD Ltd <nahidjc.cse@gmail.com>'
