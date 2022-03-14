@@ -9,13 +9,31 @@ from base.serializers import ProductSerializer, UserSerializer, UserSerializerWi
 
 from rest_framework import status
 # Create your views here.
-
+from datetime import datetime
 from rest_framework import generics
 
 # send email
 from django.core.mail import EmailMessage
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def MyOrderList(request):
+    user = request.user
+    print('nahid')
+    orders = user.order_set.all()
+    serializer = OrderSerializer(orders, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def TotalOrderList(request):
+    orders = Order.objects.all()
+    serializer = OrderSerializer(orders, many=True)
+    return Response(serializer.data)
 
 
 @api_view(['POST'])
@@ -72,6 +90,7 @@ def addOrderItems(request):
 @permission_classes([IsAuthenticated])
 def getOrderItems(request, pk):
     user = request.user
+    print(user)
     try:
         order = Order.objects.get(_id=pk)
         if user.is_staff or order.user == user:
@@ -95,3 +114,15 @@ def send_email(data):
         subject=data['email_subject'], body=data['email_body'], to=[data['to_email']])
     print('email', email)
     email.send()
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def updateOrderToPaid(request, pk):
+    order = Order.objects.get(_id=pk)
+
+    order.isPaid = True
+    order.paidAt = datetime.now()
+    order.save()
+
+    return Response('Order was paid')
