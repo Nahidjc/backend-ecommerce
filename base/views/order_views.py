@@ -119,6 +119,8 @@ def send_email(data):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def updateOrderToPaid(request, pk):
+    data = request.data
+    print('data', data)
     order = Order.objects.get(_id=pk)
 
     order.isPaid = True
