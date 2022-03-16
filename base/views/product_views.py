@@ -46,10 +46,27 @@ def createProduct(request):
         numReviews=40,
         price=49,
         countInStock=10
-
-
     )
     print("Product created Successfully", product)
     serializer = ProductSerializer(product)
 
+    return Response(serializer.data)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAdminUser])
+def updateProduct(request, pk):
+    user = request.user
+    data = request.data
+    product = Product.objects.get(_id=pk)
+    product.name = data['name']
+    product.brand = data['brand']
+    product.category = data['category']
+    product.description = data['description']
+    product.rating = data['rating']
+    product.numReviews = data['numReviews']
+    product.price = data['price']
+    product.countInStock = data['countInStock']
+    print("Product created Successfully", product)
+    serializer = ProductSerializer(product)
     return Response(serializer.data)
