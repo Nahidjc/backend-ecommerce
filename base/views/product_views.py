@@ -48,16 +48,18 @@ def deleteProduct(request, pk):
 @permission_classes([IsAdminUser])
 def createProduct(request):
     user = request.user
+    data = request.data
+    print('data', data)
     product = Product.objects.create(
         user=user,
-        name="product",
-        brand='Samsung',
-        category='Mobile Phone',
-        description='',
-        rating=4,
-        numReviews=40,
-        price=49,
-        countInStock=10
+        name=data['name'],
+        brand=data['brand'],
+        category=data['category'],
+        description=data['description'],
+        rating=0,
+        numReviews=0,
+        price=data['price'],
+        countInStock=data['countInStock']
     )
     print("Product created Successfully", product)
     serializer = ProductSerializer(product)
@@ -93,5 +95,7 @@ def uploadImage(request):
 
     product.image = request.FILES.get('image')
     product.save()
+    serializer = ProductSerializer(product)
+    print(serializer.data)
 
-    return Response('Image was uploaded')
+    return Response(serializer.data)
