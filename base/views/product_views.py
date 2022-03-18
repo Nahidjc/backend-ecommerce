@@ -49,7 +49,6 @@ def deleteProduct(request, pk):
 def createProduct(request):
     user = request.user
     data = request.data
-    print('data', data)
     product = Product.objects.create(
         user=user,
         name=data['name'],
@@ -61,7 +60,6 @@ def createProduct(request):
         price=data['price'],
         countInStock=data['countInStock']
     )
-    print("Product created Successfully", product)
     serializer = ProductSerializer(product)
 
     return Response(serializer.data)

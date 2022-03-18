@@ -8,4 +8,5 @@ urlpatterns = [
     path('my/orders/', views.MyOrderList, name='myorders'),
     path('total/orders/', views.TotalOrderList, name='totalorders'),
     path('<str:pk>/pay/', views.updateOrderToPaid, name='pay'),
+    path('update/<str:pk>/', views.updateOrderToDelivered, name='order_update'),
 ]
