@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from base.models import Product, Review
 from django.http import HttpResponse, JsonResponse
 from base.serializers import ProductSerializer, UserSerializer, UserSerializerWithToken
-
+from django.db.models import Q
 from rest_framework import status
 # Create your views here.
 
@@ -15,10 +15,26 @@ from rest_framework import generics
 
 @api_view(['GET', 'POST'])
 def getProducts(request):
+
     if request.method == 'GET':
         products = Product.objects.all()
         # print(len(products))
         serializer = ProductSerializer(products, many=True)
+    if request.method == 'POST':
+        search = request.data['searchText']
+        print(search)
+        if search == 'Nahid':
+            products = Product.objects.all()
+        else:
+
+            products = Product.objects.filter(
+                Q(category__icontains=search) | Q(name__icontains=search) | Q(
+                    description__icontains=search) | Q(brand__icontains=search)
+            )
+            print(len(products))
+        # print(len(products))
+        serializer = ProductSerializer(products, many=True)
+
         # print(serializer.data)
     return Response(serializer.data)
 
@@ -105,6 +121,7 @@ def createProductReview(request, pk):
     user = request.user
     product = Product.objects.get(_id=pk)
     data = request.data
+    print('review', data)
 
     # 1 - Review already exists
     alreadyExists = product.review_set.filter(user=user).exists()
