@@ -11,6 +11,7 @@ from rest_framework import status
 # Create your views here.
 
 from rest_framework import generics
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 @api_view(['GET', 'POST'])
@@ -21,22 +22,37 @@ def getProducts(request):
         # print(len(products))
         serializer = ProductSerializer(products, many=True)
     if request.method == 'POST':
+        print('data', request.data)
         search = request.data['searchText']
         print(search)
         if search == 'Nahid':
-            products = Product.objects.all()
+            products = Product.objects.all().order_by('-createdAt')
         else:
-
             products = Product.objects.filter(
                 Q(category__icontains=search) | Q(name__icontains=search) | Q(
                     description__icontains=search) | Q(brand__icontains=search)
-            )
+            ).order_by('-createdAt')
             print(len(products))
         # print(len(products))
+        page = request.data['page']
+        paginator = Paginator(products, 8)
+
+        try:
+            products = paginator.page(page)
+        except PageNotAnInteger:
+            products = paginator.page(1)
+        except EmptyPage:
+            products = paginator.page(paginator.num_pages)
+
+        if page == None:
+            page = 1
+
+        page = int(page)
+        print('Page:', page)
         serializer = ProductSerializer(products, many=True)
 
         # print(serializer.data)
-    return Response(serializer.data)
+    return Response({'products': serializer.data, 'page': page, 'pages': paginator.num_pages})
 
 
 @api_view(['GET'])
